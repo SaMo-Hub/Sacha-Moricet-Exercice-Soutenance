@@ -1,0 +1,455 @@
+@import "tailwindcss";
+
+/* =========================================================
+   Design tokens — palette "forêt & sable" du parc Les Cimes.
+   Déclarés dans @theme : Tailwind génère automatiquement les
+   utilitaires (bg-forest-600, text-ink-500, ...).
+   ========================================================= */
+@theme {
+  /* Vert forêt : couleur principale (actions, liens, marque) */
+  --color-forest-50: #f1f7f2;
+  --color-forest-100: #e1eee4;
+  --color-forest-200: #c2dcc9;
+  --color-forest-500: #3a8257;
+  --color-forest-600: #2a6a45;
+  --color-forest-700: #1f5135;
+  --color-forest-800: #1a4029;
+  --color-forest-900: #12301f;
+
+  /* Sable : fonds et bordures */
+  --color-sand-50: #faf7f0;
+  --color-sand-100: #f3ede0;
+  --color-sand-200: #e6dcc6;
+  --color-sand-300: #d5c7a8;
+
+  /* Encre : texte */
+  --color-ink-900: #1b201c;
+  --color-ink-700: #3a423c;
+  --color-ink-500: #5f6861; /* contraste 5,4:1 sur sand-50 */
+
+  /* Soleil : accent (places limitées, mise en avant) */
+  --color-sun-100: #fdecd9;
+  --color-sun-400: #ea8b43;
+  --color-sun-500: #e07a2f;
+  --color-sun-700: #9a4610;
+
+  /* Danger : erreurs et actions destructives */
+  --color-danger-50: #fcefed;
+  --color-danger-200: #f2c4bd;
+  --color-danger-600: #b3372a;
+  --color-danger-700: #8f2a1f;
+
+  /* Typographie (variables créées par next/font dans fonts/fonts.tsx) */
+  --font-sans: var(--rethink-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--outfit), ui-sans-serif, system-ui, sans-serif;
+
+  /* Courbes et durées d'animation */
+  --ease-out-soft: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-soft: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --shadow-card: 0 1px 2px rgb(18 48 31 / 0.06), 0 4px 16px -4px rgb(18 48 31 / 0.08);
+  --shadow-lift: 0 2px 4px rgb(18 48 31 / 0.06), 0 12px 32px -8px rgb(18 48 31 / 0.18);
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Le header sticky (64 px) ne doit jamais masquer l'élément qui reçoit le focus
+       ni la cible d'une ancre (#reservation) */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background: var(--color-sand-50);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    color: var(--color-forest-900);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  /* Focus clavier toujours visible, jamais au clic souris */
+  :focus-visible {
+    outline: 2px solid var(--color-forest-600);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-forest-200);
+  }
+}
+
+/* =========================================================
+   Composants réutilisables.
+   Les classes conditionnelles (clsx) doivent être déclarées
+   dans le CSS global et non dans un module (cf. cours).
+   ========================================================= */
+@layer components {
+  /* Conteneur de page */
+  .container-page {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  /* ---------- Boutons ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem; /* cible tactile de 44 px */
+    padding: 0.625rem 1.125rem;
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 160ms var(--ease-out-soft),
+      border-color 160ms var(--ease-out-soft),
+      color 160ms var(--ease-out-soft),
+      transform 160ms var(--ease-out-soft);
+  }
+  .btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+  .btn-sm {
+    min-height: 2.25rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 0.625rem;
+  }
+  .btn-block {
+    width: 100%;
+  }
+
+  .btn-primary {
+    background: var(--color-forest-600);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: white;
+    border-color: var(--color-sand-200);
+    color: var(--color-forest-900);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-ink-700);
+  }
+
+  .btn-danger {
+    background: var(--color-danger-600);
+    color: white;
+  }
+
+  .btn-danger-outline {
+    background: white;
+    border-color: var(--color-danger-200);
+    color: var(--color-danger-600);
+  }
+
+  /* ---------- Formulaires ---------- */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+  .label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ink-700);
+  }
+  .hint {
+    font-size: 0.8125rem;
+    color: var(--color-ink-500);
+  }
+  .input {
+    width: 100%;
+    min-height: 2.875rem;
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-sand-200);
+    background: white;
+    font-size: 1rem; /* >= 16 px : pas de zoom automatique sur iOS */
+    color: var(--color-ink-900);
+    transition:
+      border-color 160ms var(--ease-out-soft),
+      box-shadow 160ms var(--ease-out-soft);
+  }
+  .input::placeholder {
+    color: #737a74; /* 4,4:1 sur blanc */
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--color-forest-500);
+    box-shadow: 0 0 0 3px rgb(58 130 87 / 0.18);
+  }
+  .input[aria-invalid="true"] {
+    border-color: var(--color-danger-600);
+  }
+  .input[aria-invalid="true"]:focus {
+    box-shadow: 0 0 0 3px rgb(179 55 42 / 0.15);
+  }
+  textarea.input {
+    min-height: 8rem;
+    resize: vertical;
+  }
+  select.input {
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%235f6861' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+  }
+
+  /* ---------- Surfaces ---------- */
+  .card {
+    background: white;
+    border: 1px solid var(--color-sand-200);
+    border-radius: 1.25rem;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Pastille (type d'activité, statut) */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.1875rem 0.625rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    background: var(--color-forest-50);
+    color: var(--color-forest-700);
+  }
+  .badge-neutral {
+    background: var(--color-sand-100);
+    color: var(--color-ink-700);
+  }
+  .badge-warning {
+    background: var(--color-sun-100);
+    color: var(--color-sun-700);
+  }
+  .badge-danger {
+    background: var(--color-danger-50);
+    color: var(--color-danger-700);
+  }
+
+  /* Puce de filtre (types d'activité) */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-sand-200);
+    background: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ink-700);
+    white-space: nowrap;
+    transition:
+      background-color 160ms var(--ease-out-soft),
+      border-color 160ms var(--ease-out-soft),
+      color 160ms var(--ease-out-soft);
+  }
+  .chip.active {
+    background: var(--color-forest-900);
+    border-color: var(--color-forest-900);
+    color: white;
+  }
+
+  /* Lien de navigation (menu principal et onglets du compte) */
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--color-ink-700);
+    transition:
+      background-color 160ms var(--ease-out-soft),
+      color 160ms var(--ease-out-soft);
+  }
+  .nav-link.active {
+    background: var(--color-forest-50);
+    color: var(--color-forest-700);
+  }
+
+  /* ---------- Survol ----------
+     Réservé aux appareils qui ont un vrai pointeur : sur écran tactile,
+     un :hover resterait "collé" après le tap. */
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover:not(:disabled) {
+      background: var(--color-forest-700);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--color-sand-300);
+      background: var(--color-sand-100);
+    }
+    .btn-ghost:hover:not(:disabled) {
+      background: var(--color-sand-100);
+      color: var(--color-forest-900);
+    }
+    .btn-danger:hover:not(:disabled) {
+      background: var(--color-danger-700);
+    }
+    .btn-danger-outline:hover:not(:disabled) {
+      background: var(--color-danger-50);
+    }
+    /* Le survol ne doit écraser ni la bordure de focus, ni celle d'erreur */
+    .input:hover:not(:focus):not([aria-invalid="true"]) {
+      border-color: var(--color-sand-300);
+    }
+    .chip:hover {
+      border-color: var(--color-sand-300);
+      color: var(--color-forest-900);
+    }
+    .nav-link:hover {
+      background: var(--color-sand-100);
+      color: var(--color-forest-900);
+    }
+    /* Un élément actif garde son apparence au survol */
+    .chip.active:hover {
+      border-color: var(--color-forest-900);
+      color: white;
+    }
+    .nav-link.active:hover {
+      background: var(--color-forest-50);
+      color: var(--color-forest-700);
+    }
+  }
+
+  /* Squelette de chargement */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-sand-100) 25%,
+      var(--color-sand-50) 50%,
+      var(--color-sand-100) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+    border-radius: 0.5rem;
+  }
+
+  /* Boîte de dialogue de confirmation (<dialog> natif) */
+  .dialog {
+    margin: auto;
+    width: calc(100% - 2rem);
+    max-width: 28rem;
+    padding: 0;
+    border: none;
+    border-radius: 1.25rem;
+    background: white;
+    color: var(--color-ink-900);
+    box-shadow: var(--shadow-lift);
+  }
+  .dialog[open] {
+    animation: dialog-in 220ms var(--ease-out-soft);
+  }
+  .dialog::backdrop {
+    background: rgb(18 48 31 / 0.45);
+    animation: fade-in 220ms var(--ease-out-soft);
+  }
+  /* Sur mobile, la confirmation devient une feuille ancrée en bas, à portée du pouce */
+  @media (max-width: 639px) {
+    .dialog {
+      width: 100%;
+      max-width: none;
+      margin: auto 0 0;
+      border-radius: 1.25rem 1.25rem 0 0;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .dialog[open] {
+      animation: sheet-in 280ms var(--ease-out-soft);
+    }
+  }
+
+  /* Indicateur de chargement retardé : invisible pendant 300 ms (il garde sa place,
+     donc aucun saut de mise en page), puis fondu. Une réponse rapide ne le fait
+     jamais clignoter. */
+  .loader-delayed {
+    animation: fade-in 150ms var(--ease-out-soft) 300ms both;
+  }
+
+  /* Apparition douce du contenu chargé */
+  .fade-in {
+    animation: fade-up 320ms var(--ease-out-soft) both;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+/* Réduction des animations : on supprime les mouvements, on garde des fondus brefs */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.12s !important;
+    scroll-behavior: auto !important;
+  }
+  .btn:active:not(:disabled) {
+    transform: none;
+  }
+}
